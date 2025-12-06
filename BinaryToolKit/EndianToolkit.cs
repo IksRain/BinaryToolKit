@@ -12,39 +12,57 @@ public static class EndianToolkit
     /// <summary>
     /// reverses the endianness of an unmanaged type(value).
     /// </summary>
-    /// <param name="value">value wait to reversing</param>
+    /// <param name="value">value wait to reverse</param>
     /// <typeparam name="T">type you want to reverse</typeparam>
     public static unsafe void Reverse<T>(scoped ref T value) where T : unmanaged
+#if NET9_0_OR_GREATER
+        ,
+        // dotnet 8 not support by ref 
+        allows ref struct
+#endif
+    {
+        fixed (T* ptr = &value)
+        {
+            Reverse(ptr);
+        }
+    }
+    /// <summary>
+    /// reverses the endianness of an unmanaged type(value).
+    /// </summary>
+    /// <param name="value">target position you want to reverse</param>
+    public static unsafe void Reverse<T>(T* value) where T : unmanaged
+#if NET9_0_OR_GREATER
+        ,
+        // dotnet 8 not support by ref 
+        allows ref struct
+#endif
     {
         
-        fixed (void* ptr = &value)
+        switch (sizeof(T))
         {
-            switch (sizeof(T))
-            {
-                case 1:
-                    return;
-                case 2:
-                    var temp2 = BinaryPrimitives.ReverseEndianness(*(short*)ptr);
-                    *(short*)ptr = temp2;
-                    break;
-                case 4:
-                    var temp4 = BinaryPrimitives.ReverseEndianness(*(int*)ptr);
-                    *(int*)ptr = temp4;
-                    break;
-                case 8:
-                    var temp8 = BinaryPrimitives.ReverseEndianness(*(long*)ptr);
-                    *(long*)ptr = temp8;
-                    break;
+            case 1:
+                return;
+            case 2:
+                var temp2 = BinaryPrimitives.ReverseEndianness(*(short*)value);
+                *(short*)value = temp2;
+                break;
+            case 4:
+                var temp4 = BinaryPrimitives.ReverseEndianness(*(int*)value);
+                *(int*)value = temp4;
+                break;
+            case 8:
+                var temp8 = BinaryPrimitives.ReverseEndianness(*(long*)value);
+                *(long*)value = temp8;
+                break;
 #if NET5_0_OR_GREATER
-                case 16:
-                    var temp16 = BinaryPrimitives.ReverseEndianness(*(Int128*)ptr);
-                    *(Int128*)ptr = temp16;
-                    break;
+            case 16:
+                var temp16 = BinaryPrimitives.ReverseEndianness(*(Int128*)value);
+                *(Int128*)value = temp16;
+                break;
 #endif
-                default:
-                    new Span<byte>(ptr, sizeof(T)).Reverse();
-                    break;
-            }
+            default:
+                new Span<byte>(value, sizeof(T)).Reverse();
+                break;
         }
     }
 
@@ -56,6 +74,11 @@ public static class EndianToolkit
     /// <param name="from">source endian,can use local</param>
     /// <param name="to">target endian,can use local</param>
     public static void Convert<T>(scoped ref T value, Endianness from, Endianness to) where T : unmanaged
+#if NET9_0_OR_GREATER
+            ,
+            // dotnet 8 not support by ref 
+            allows ref struct
+#endif
     {
         //process local
         if(from is Endianness.Local)from = BitConverter.IsLittleEndian? Endianness.Little : Endianness.Big;
@@ -64,8 +87,43 @@ public static class EndianToolkit
         if (from == to) return;
         // differ, reverse
         Reverse(ref value);
-        return;
     }
+
+
+    #region Multiple
+
+    /// <summary>
+    /// reverses the endianness of multiple unmanaged type(values).
+    /// </summary>
+    /// <param name="values">target enumerable wait to reverse</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ReversMany<T>(Span<T> values) where T : unmanaged
+    {
+        foreach (ref var value in values)
+        {
+            Reverse(ref value);
+        }
+    }
+    /// <summary>
+    /// converts the endianness of multiple unmanaged type(value) from one to another.
+    /// </summary>
+    /// <param name="target">target position to reverse endianness</param>
+    /// <param name="lenght">the number of ptr field</param>
+    /// <typeparam name="T"></typeparam>
+    public static unsafe void ConvertMany<T>(T* target, int lenght) where T : unmanaged
+#if NET9_0_OR_GREATER
+        ,
+        // dotnet 8 not support by ref 
+        allows ref struct
+#endif
+    {
+        while (lenght-->0)
+        {
+            Reverse(ref *target);
+            target++;
+        }
+    }
+    #endregion
 
 
 }
