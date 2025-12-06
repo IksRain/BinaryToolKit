@@ -1,5 +1,17 @@
 # Feature:
-+ `Iks.Binary.ToolkitBinaryStreamToolkit` 提供Stream的泛型读写扩展方法
+#### [跳转到`Feature`](Feature.md)
+
+# Github-Actions
+#### 可能我调的`actions`比我的库有用一点(
+#### [跳转到我的`Actions`](.github/workflows/dotnet-build-publish.yml)
++ 只需要为仓库添加`NUGET_API_KEY机密`并修改`env: project`即可使用
++ **通过`打Tag`执行发布流程**
+  + `版本号` 就是 `Tag`名
+  + `Preview版本`在`Tag`中后缀`preview`
+  + 自动生成符号包`snupkg`并推送
+  + 您只需要关心`Icon`,`LICENSE`,`ReadMeFile`和`包描述`即可(都是IDE中很好指定的)
+# 为什么我们需要泛型支持？
++ 
     + `T Stream.ReadAs<T>()`
         + 用于从Stream中读取一个非托管类型数据(如int,Int128)
     + `void Stream.Write<T>(in T)`

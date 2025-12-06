@@ -1,8 +1,10 @@
-name: Build
+name: Build-And-Publish
 
+# secerts 需要添加 NUGET_API_KEY以发布到 nuget.org
 env:
   dotnet-version: 10.x
   nuget-package-path: nupkgs
+  # 项目名，留空也可以，只有部分项目会提示目录下有多个解决方案需要在这里指定到.slnx，如果需要使用请更改这个或者留空
   project:  BinaryToolKit.slnx
 on:
   push:
@@ -19,9 +21,9 @@ jobs:
       DOTNET_CLI_UI_LANGUAGE: zh-CN
     strategy:
       matrix:
-        build-config:
-          - Debug
+        build-config: 
           - Release
+          - Debug
     
     runs-on: windows-latest
     steps:

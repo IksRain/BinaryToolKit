@@ -5,6 +5,7 @@
     <BuildType Name="Release" />
   </Configurations>
   <Folder Name="/Docs/">
+    <File Path="Feature.md" />
     <File Path="icon.png" />
     <File Path="LICENSE.md" />
     <File Path="README.md" />
