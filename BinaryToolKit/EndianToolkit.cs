@@ -10,6 +10,8 @@ namespace Iks.BinaryToolkit;
 /// </summary>
 public static class EndianToolkit
 {
+    #region Single
+
     /// <summary>
     /// reverses the endianness of an unmanaged type(value).
     /// </summary>
@@ -91,6 +93,7 @@ public static class EndianToolkit
     /// converts the endianness of an unmanaged type(value) from one to another.
     /// it cannot to make sure struct members are all in the same endian.it just reverses byte-endianness of the whole struct.
     /// </summary>
+    /// <param name="value">target value</param>
     /// <param name="from">source endian,can use local</param>
     /// <param name="to">target endian,can use local</param>
     public static void Convert<T>(scoped ref T value, Endianness from, Endianness to) where T : unmanaged
@@ -109,7 +112,9 @@ public static class EndianToolkit
         Reverse(ref value);
     }
 
-
+    #endregion
+    
+    
     #region Multiple
 
     /// <summary>
