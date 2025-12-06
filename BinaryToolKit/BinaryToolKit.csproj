@@ -14,11 +14,13 @@
         <PackageIcon>icon.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Description>
-            你不需要将类型名当泛型名使用的函数,同样的逻辑当然只需要一个泛型,本库针对二进制读写(包括端序)相关内容提供泛型支持,让您在泛型函数中可以更灵活地使用
+            你不需要将类型名当泛型名使用的函数,同样的逻辑当然只需要一个泛型,本库针对二进制读写(包括端序)相关内容提供泛型支持,让您在泛型函数中可以更灵活地使用，额外提供更多实用工具
         </Description>
         <Configurations>Debug;Release;PackNuget</Configurations>
         <Platforms>AnyCPU</Platforms>
         <TargetFrameworks>net10.0;net8.0;net9.0</TargetFrameworks>
+        <PackageProjectUrl>https://github.com/IksRain/BinaryToolKit</PackageProjectUrl>
+        <PackageTags>Tool</PackageTags>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'PackNuget' ">
