@@ -143,7 +143,8 @@ public static class EndianToolkit
         {
             throw new ArgumentException(ErrorMessage.Not_Supported_Type_With_Pointer, nameof(T));
         }
-
+        //do not reverse
+        if(sizeof(T) ==1)return;
         while (lenght-- > 0)
         {
             ReverseNoCheck(target);
@@ -158,6 +159,7 @@ public static class EndianToolkit
     /// <param name="lenght">the number of ptr field</param>
     /// <param name="from">source endian,can use local</param>
     /// <param name="to">target endian,can use local</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static unsafe void ConvertMany<T>(T* target, int lenght, Endianness from, Endianness to) where T : unmanaged
 #if NET9_0_OR_GREATER
         ,
@@ -165,22 +167,13 @@ public static class EndianToolkit
         allows ref struct
 #endif
     {
-        if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-        {
-            throw new ArgumentException(ErrorMessage.Not_Supported_Type_With_Pointer, nameof(T));
-        }
-
         //process local
         if (from is Endianness.Local) from = BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
         if (to is Endianness.Local) to = BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
         // same,do nothing
         if (from == to) return;
         // differ, reverse
-        while (lenght-- > 0)
-        {
-            ReverseNoCheck(target);
-            target++;
-        }
+        ReverseMany(target, lenght);
     }
 
     /// <summary>
