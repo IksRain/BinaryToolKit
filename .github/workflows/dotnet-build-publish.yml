@@ -6,6 +6,10 @@ env:
   project:  BinaryToolKit.slnx
 on:
   push:
+    branches:
+      - main
+  pull_request: 
+  workflow_dispatch: 
 
 jobs:
   # 构建项目
