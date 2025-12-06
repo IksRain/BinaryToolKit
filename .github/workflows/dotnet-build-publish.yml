@@ -1,0 +1,152 @@
+name: Build
+
+env:
+  dotnet-version: 10.x
+  nuget-package-path: nupkgs
+  project:  BinaryToolkit.Iks.slnx
+on:
+  push:
+
+jobs:
+  # 构建项目
+  build:
+    # 设置.NET CLI中文环境
+    env:
+      DOTNET_CLI_UI_LANGUAGE: zh-CN
+    strategy:
+      matrix:
+        build-config:
+          - Debug
+          - Release
+    
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6.0.1
+      - uses: actions/setup-dotnet@v5.0.1
+        with:
+          dotnet-version: ${{ env.dotnet-version }}
+
+      - name: 打包snupkg
+        shell: pwsh
+        run: |
+          # 如果有tag 设置包版本
+          $packages_versions = if($${{ github.ref_type == 'tag'}}){ "-p:PackageVersion=${{ github.ref_name }}" } else { "" }
+          # 构建
+          dotnet pack ${{ env.project }} `
+          -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg `
+          -o ${{ env.nuget-package-path }} `
+          -c ${{ matrix.build-config }} `
+          -p:GenerateDocumentationFile=true `
+          $packages_versions
+      #用于查看生成的包是否完整
+      - name: 检查nupkg
+        shell: pwsh
+        run: |
+          Get-ChildItem ${{ env.nuget-package-path }} | Select-Object Length,Name
+
+      - name: 上传包
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          name: packages.${{ matrix.build-config }}
+          path: ${{ env.nuget-package-path }}
+  # 测试项目
+  test-projects:
+    runs-on: windows-latest
+    env:
+      DOTNET_CLI_UI_LANGUAGE: zh-CN
+    
+    strategy:
+      matrix:
+        build-config:
+          - Debug
+          - Release
+    steps:
+      - uses: actions/checkout@v6.0.1
+      - uses: actions/setup-dotnet@v5.0.1
+      - name: 测试
+        shell: pwsh
+        run: |
+          dotnet test ${{ env.project }} -c ${{ matrix.build-config }}
+  
+  
+  
+  # 发布包到nuget.org
+  publish-nuget:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    env:
+      DOTNET_CLI_UI_LANGUAGE: zh-CN
+    steps:
+      - name: 下载构建产物
+        uses: actions/download-artifact@v6.0.0
+        with:
+          name: packages.Release
+          path: ${{ env.nuget-package-path }}
+      - name: 设置nuget
+        uses: actions/setup-dotnet@v5.0.1
+        with:
+          dotnet-version: ${{ env.dotnet-version }}
+      - name: 查看dotnet版本
+        shell: pwsh
+        run: |
+          dotnet --version
+          dotnet nuget --version
+      - name: 发布包到nuget
+        shell: pwsh
+        run: |
+          dotnet nuget push '${{ env.nuget-package-path }}/*.nupkg' --source nuget.org --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+          dotnet nuget push '${{ env.nuget-package-path }}/*.snupkg' --source nuget.org --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+  
+  
+  # 发布包到github-release-page
+  publish-github-release:
+    needs: build
+    permissions: write-all
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    steps:
+      - name: 下载构建产物
+        uses: actions/download-artifact@v6.0.0
+        with:
+          name: packages.Release
+          path: ${{ env.nuget-package-path }}
+      - name: 发布包到github-release-page
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          files: ${{ env.nuget-package-path }}/*
+          prerelease: ${{ contains(github.ref_name, 'preview')}}
+          generate_release_notes: true
+          append_body: true
+          body: |
+            ${{ join(github.event.commits, '\n') }}
+  
+  # 发布包到github-packages
+  publish-github-packages:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    env:
+      DOTNET_CLI_UI_LANGUAGE: zh-CN
+    steps:
+      - name: 下载构建产物
+        uses: actions/download-artifact@v6.0.0
+        with:
+          name: packages.Release
+          path: ${{ env.nuget-package-path }}
+      - uses: actions/setup-dotnet@v5.0.1
+        with:
+          dotnet-version: ${{ env.dotnet-version }}
+      - name: 查看dotnet版本
+        shell: pwsh
+        run: |
+          dotnet --version
+          dotnet nuget --version
+      - name: 发布包到github-packages
+        shell: pwsh
+        run: |
+          dotnet nuget add source  --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          dotnet nuget push '${{ env.nuget-package-path }}/*.nupkg' --source github --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+          dotnet nuget push '${{ env.nuget-package-path }}/*.snupkg' --source github --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+      
+          
