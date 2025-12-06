@@ -1,4 +1,5 @@
-﻿using Iks.BinaryToolkit;
+﻿using System.Buffers.Binary;
+using Iks.BinaryToolkit;
 using Xunit.Abstractions;
 
 namespace BinaryKit_Test;
@@ -34,5 +35,30 @@ public class EndianTest(ITestOutputHelper output)
         output.WriteLine("actual: " + actual);
         Assert.Equal(expected, actual);
     }
+
+    #region Multiple-Test
+
+    [Fact]
+    public void ReverseManyTest()
+    {
+        Span<int> old = [10,20,30,40,50,60,70,80];
+        Span<int> expected = stackalloc int[old.Length];
+        for (var index = 0; index < old.Length; index++)
+        {
+            var item = old[index];
+            expected[index] = BinaryPrimitives.ReverseEndianness(item);
+        }
+
+        EndianToolkit.ReverseMany(old);
+        for (int i = 0; i < old.Length; i++)
+        {
+            if (old[i] != expected[i])
+            {
+                Assert.Fail();
+            }
+        }
+    }
     
+
+    #endregion
 }

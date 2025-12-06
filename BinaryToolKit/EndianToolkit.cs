@@ -10,6 +10,8 @@ namespace Iks.BinaryToolkit;
 /// </summary>
 public static class EndianToolkit
 {
+    #region Single
+
     /// <summary>
     /// reverses the endianness of an unmanaged type(value).
     /// </summary>
@@ -91,6 +93,7 @@ public static class EndianToolkit
     /// converts the endianness of an unmanaged type(value) from one to another.
     /// it cannot to make sure struct members are all in the same endian.it just reverses byte-endianness of the whole struct.
     /// </summary>
+    /// <param name="value">target value</param>
     /// <param name="from">source endian,can use local</param>
     /// <param name="to">target endian,can use local</param>
     public static void Convert<T>(scoped ref T value, Endianness from, Endianness to) where T : unmanaged
@@ -109,7 +112,9 @@ public static class EndianToolkit
         Reverse(ref value);
     }
 
-
+    #endregion
+    
+    
     #region Multiple
 
     /// <summary>
@@ -138,39 +143,8 @@ public static class EndianToolkit
         {
             throw new ArgumentException(ErrorMessage.Not_Supported_Type_With_Pointer, nameof(T));
         }
-
-        while (lenght-- > 0)
-        {
-            ReverseNoCheck(target);
-            target++;
-        }
-    }
-
-    /// <summary>
-    /// converts the endianness of multiple unmanaged type(value) from one to another.
-    /// </summary>
-    /// <param name="target">target position to reverse endianness</param>
-    /// <param name="lenght">the number of ptr field</param>
-    /// <param name="from">source endian,can use local</param>
-    /// <param name="to">target endian,can use local</param>
-    public static unsafe void ConvertMany<T>(T* target, int lenght, Endianness from, Endianness to) where T : unmanaged
-#if NET9_0_OR_GREATER
-        ,
-        // dotnet 8 not support by ref 
-        allows ref struct
-#endif
-    {
-        if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-        {
-            throw new ArgumentException(ErrorMessage.Not_Supported_Type_With_Pointer, nameof(T));
-        }
-
-        //process local
-        if (from is Endianness.Local) from = BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
-        if (to is Endianness.Local) to = BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
-        // same,do nothing
-        if (from == to) return;
-        // differ, reverse
+        //do not reverse
+        if(sizeof(T) ==1)return;
         while (lenght-- > 0)
         {
             ReverseNoCheck(target);
@@ -192,6 +166,32 @@ public static class EndianToolkit
             ConvertMany(ptr, target.Length, from, to);
         }
     }
+    
+    /// <summary>
+    /// converts the endianness of multiple unmanaged type(value) from one to another.
+    /// </summary>
+    /// <param name="target">target position to reverse endianness</param>
+    /// <param name="lenght">the number of ptr field</param>
+    /// <param name="from">source endian,can use local</param>
+    /// <param name="to">target endian,can use local</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe void ConvertMany<T>(T* target, int lenght, Endianness from, Endianness to) where T : unmanaged
+#if NET9_0_OR_GREATER
+        ,
+        // dotnet 8 not support by ref 
+        allows ref struct
+#endif
+    {
+        //process local
+        if (from is Endianness.Local) from = BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
+        if (to is Endianness.Local) to = BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
+        // same,do nothing
+        if (from == to) return;
+        // differ, reverse
+        ReverseMany(target, lenght);
+    }
+
+    
 
     #endregion
 }
