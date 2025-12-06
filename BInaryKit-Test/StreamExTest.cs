@@ -81,5 +81,35 @@ public class StreamExTest(ITestOutputHelper output)
         Assert.Equal(expected, value);
     }
     #endregion
-   
+
+    #region Multiple-Test
+
+    [Fact]
+    public unsafe void MultipleRead()
+    {
+        byte[] ints = [10,20,30,40];
+        Span<int> span = stackalloc int[1];
+        var ptr = (int*)Unsafe.AsPointer(ref MemoryMarshal.GetReference(ints));
+        var expected = *ptr;
+        using var stream = new MemoryStream(ints);
+        stream.ReadManyAs(span);
+        Assert.Equal(expected, span[0]);
+        stream.Position = 0;
+        Span<short> span2 = stackalloc short[2];
+        stream.ReadManyAs(span2);
+        if (span2[0] != *(short*)ptr) Assert.Fail();
+        if (span2[1] != ((short*)ptr)[1]) Assert.Fail();
+    } 
+    
+    [Fact]
+    public void MultipleWrite()
+    {
+        byte[] ints = [10,20,30,40];
+        using var stream = new MemoryStream();
+        stream.WriteManyFrom(ints);
+        if (stream.GetBuffer() is not [10,20,30,40,..]) Assert.Fail();
+    } 
+    
+
+    #endregion
 }
