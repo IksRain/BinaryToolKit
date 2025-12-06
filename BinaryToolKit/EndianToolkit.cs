@@ -156,6 +156,21 @@ public static class EndianToolkit
     /// converts the endianness of multiple unmanaged type(value) from one to another.
     /// </summary>
     /// <param name="target">target position to reverse endianness</param>
+    /// <param name="from">source endian,can use local</param>
+    /// <param name="to">target endian,can use local</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe void ConvertMany<T>(Span<T> target, Endianness from, Endianness to) where T : unmanaged
+    {
+        fixed (T* ptr = &MemoryMarshal.GetReference(target))
+        {
+            ConvertMany(ptr, target.Length, from, to);
+        }
+    }
+    
+    /// <summary>
+    /// converts the endianness of multiple unmanaged type(value) from one to another.
+    /// </summary>
+    /// <param name="target">target position to reverse endianness</param>
     /// <param name="lenght">the number of ptr field</param>
     /// <param name="from">source endian,can use local</param>
     /// <param name="to">target endian,can use local</param>
@@ -176,20 +191,7 @@ public static class EndianToolkit
         ReverseMany(target, lenght);
     }
 
-    /// <summary>
-    /// converts the endianness of multiple unmanaged type(value) from one to another.
-    /// </summary>
-    /// <param name="target">target position to reverse endianness</param>
-    /// <param name="from">source endian,can use local</param>
-    /// <param name="to">target endian,can use local</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static unsafe void ConvertMany<T>(Span<T> target, Endianness from, Endianness to) where T : unmanaged
-    {
-        fixed (T* ptr = &MemoryMarshal.GetReference(target))
-        {
-            ConvertMany(ptr, target.Length, from, to);
-        }
-    }
+    
 
     #endregion
 }
