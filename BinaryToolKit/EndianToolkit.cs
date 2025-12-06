@@ -78,10 +78,12 @@ public enum Endianness
     /// little-endian byte order
     /// </summary>
     Little,
+    
     /// <summary>
     /// big-endian byte order
     /// </summary>
     Big,
+    
     /// <summary>
     /// local machine byte order
     /// eq as BitConverter.IsLittleEndian
