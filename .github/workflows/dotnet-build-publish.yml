@@ -3,7 +3,7 @@ name: Build
 env:
   dotnet-version: 10.x
   nuget-package-path: nupkgs
-  project:  BinaryToolkit.Iks.slnx
+  project:  BinaryToolKit.slnx
 on:
   push:
 

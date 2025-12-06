@@ -1,10 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AssemblyName>BinaryToolKit.Iks</AssemblyName>
+        <RootNamespace>Iks.BinaryToolKit</RootNamespace>
+        <PackageId>BinaryToolKit.Iks</PackageId>
+        <Authors>Iks-Rain</Authors>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <!--元数据-->
+        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Description>
+            你不需要将类型名当泛型名使用的函数,同样的逻辑当然只需要一个泛型,本库针对二进制读写(包括端序)相关内容提供泛型支持,让您在泛型函数中可以更灵活地使用
+        </Description>
+        <Configurations>Debug;Release;PackNuget</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <TargetFrameworks>net10.0;net8.0;net9.0</TargetFrameworks>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'PackNuget' ">
+        <DefineConstants>TRACE RELEASE</DefineConstants>
+        <Optimize>true</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+        <DocumentationFile>bin\PackNuget\BinaryToolKit.xml</DocumentationFile>
+        <DebugType>portable</DebugType>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="../LICENSE.md" Pack="true" PackagePath=""/>
+        <None Include="../icon.png" Pack="true" PackagePath=""/>
+        <None Include="../README.md" Pack="true" PackagePath=""/>
+    </ItemGroup>
 </Project>
