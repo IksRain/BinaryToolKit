@@ -36,7 +36,7 @@ public static class BinaryStreamToolkit
             if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
                 throw new NotSupportedException(ErrorMessage.Not_Supported_Type_With_Pointer);
             var value = stackalloc byte[sizeof(T)];
-            var count = stream.Read(new Span<byte>(&value, sizeof(T)));
+            var count = stream.Read(new Span<byte>(value, sizeof(T)));
             if (count != sizeof(T)) throw new EndOfStreamException(ErrorMessage.Not_Enough_Data_In_Stream);
             return *(T*)value;
         }
