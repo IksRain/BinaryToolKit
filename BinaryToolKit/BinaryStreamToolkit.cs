@@ -35,11 +35,10 @@ public static class BinaryStreamToolkit
         {
             if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
                 throw new NotSupportedException(ErrorMessage.Not_Supported_Type_With_Pointer);
-
-            Unsafe.SkipInit(out T value);
+            var value = stackalloc byte[sizeof(T)];
             var count = stream.Read(new Span<byte>(&value, sizeof(T)));
             if (count != sizeof(T)) throw new EndOfStreamException(ErrorMessage.Not_Enough_Data_In_Stream);
-            return value;
+            return *(T*)value;
         }
 
         /// <summary>
@@ -55,7 +54,6 @@ public static class BinaryStreamToolkit
         {
             if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
                 throw new NotSupportedException(ErrorMessage.Not_Supported_Type_With_Pointer);
-
             fixed (void* ptr = &target)
             {
                 var count = stream.Read(new Span<byte>(ptr, sizeof(T)));
@@ -67,16 +65,25 @@ public static class BinaryStreamToolkit
         ///  write an unmanaged type(value) to the stream.
         /// </summary>
         /// <typeparam name="T">target type</typeparam>
-        public unsafe void WriteFrom<T>(scoped in T value) where T : unmanaged
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public unsafe void WriteFrom<T>(T value) where T : unmanaged
 #if NET9_0_OR_GREATER
             ,
             // dotnet 8 not support by ref 
             allows ref struct
 #endif
         {
-            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-                throw new NotSupportedException(ErrorMessage.Not_Supported_Type_With_Pointer);
+            stream.Write(new ReadOnlySpan<byte>(&value, sizeof(T)));
+        }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public unsafe void WriteFrom<T>(ref readonly T value) where T : unmanaged
+#if NET9_0_OR_GREATER
+            ,
+            // dotnet 8 not support by ref 
+            allows ref struct
+#endif
+        {
             fixed (void* ptr = &value)
             {
                 stream.Write(new ReadOnlySpan<byte>(ptr, sizeof(T)));
@@ -95,8 +102,10 @@ public static class BinaryStreamToolkit
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe void ReadManyAs<T>(Span<T> targetSpan) where T : unmanaged
         {
-            // ReadManyAs(T*) has already checked if T has reference field
-            ReadManyAs(stream, (T*)Unsafe.AsPointer(ref MemoryMarshal.GetReference(targetSpan)), targetSpan.Length);
+            fixed(T* ptrT = &MemoryMarshal.GetReference(targetSpan))
+            {
+                ReadManyAs(stream, ptrT, targetSpan.Length);
+            }
         }
 
         /// <summary>
@@ -141,7 +150,10 @@ public static class BinaryStreamToolkit
         /// <param name="values">target position</param>
         public unsafe void WriteManyFrom<T>(ReadOnlySpan<T> values) where T : unmanaged
         {
-            WriteManyFrom(stream, (T*)Unsafe.AsPointer(ref MemoryMarshal.GetReference(values)), values.Length);
+            fixed(T* ptrT = &MemoryMarshal.GetReference(values))
+            {
+                WriteManyFrom(stream,ptrT, values.Length);
+            }
         }
 
         #endregion
