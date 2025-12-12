@@ -75,7 +75,11 @@ public static class BinaryStreamToolkit
         {
             stream.Write(new ReadOnlySpan<byte>(&value, sizeof(T)));
         }
-
+        
+        /// <summary>
+        /// write an unmanaged type(value) to the stream.
+        /// </summary>
+        /// <typeparam name="T">target type</typeparam>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe void WriteFrom<T>(ref readonly T value) where T : unmanaged
 #if NET9_0_OR_GREATER

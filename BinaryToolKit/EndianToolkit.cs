@@ -184,6 +184,7 @@ public enum Endianness
     Big
 }
 
+/// Extension of <see cref="Endianness"/>,provide <c>Local</c>
 public static class EndiannessExtension
 {
     private static readonly Endianness LocalEndianness =
