@@ -38,7 +38,7 @@ public static class BinaryStreamToolkit
 
             Unsafe.SkipInit(out T value);
             var count = stream.Read(new Span<byte>(&value, sizeof(T)));
-            if (count != sizeof(T)) throw new EndOfStreamException(ErrorMessage.NotEnoughDataInStream);
+            if (count != sizeof(T)) throw new EndOfStreamException(ErrorMessage.Not_Enough_Data_In_Stream);
             return value;
         }
 
@@ -59,7 +59,7 @@ public static class BinaryStreamToolkit
             fixed (void* ptr = &target)
             {
                 var count = stream.Read(new Span<byte>(ptr, sizeof(T)));
-                if (count != sizeof(T)) throw new EndOfStreamException(ErrorMessage.NotEnoughDataInStream);
+                if (count != sizeof(T)) throw new EndOfStreamException(ErrorMessage.Not_Enough_Data_In_Stream);
             }
         }
 
