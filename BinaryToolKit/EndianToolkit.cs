@@ -191,6 +191,10 @@ public static class EndiannessExtension
 
     extension(Endianness obj)
     {
+        /// <summary>
+        /// local machine byte order
+        /// same as BitConverter.IsLittleEndian
+        /// </summary>
         public static Endianness Local => LocalEndianness;
     }
 }
