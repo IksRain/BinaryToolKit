@@ -12,7 +12,7 @@ public class EndianTest(ITestOutputHelper output)
         const int value = 1000;
         var expected = BitConverter.IsLittleEndian ? value : System.Buffers.Binary.BinaryPrimitives.ReverseEndianness(value);
         var actual = value;
-        EndianToolkit.Convert(ref actual, Endianness.Local, Endianness.Little);
+        actual = EndianToolkit.Convert(actual, Endianness.Local, Endianness.Little);
         output.WriteLine("expected: " + expected);
         output.WriteLine("actual: " + actual);
         Assert.Equal(expected, actual);
@@ -30,7 +30,7 @@ public class EndianTest(ITestOutputHelper output)
             new Span<byte>(&expected, sizeof(UnionStruct)).Reverse();
         }
         // to big endian
-        EndianToolkit.Convert(ref actual, Endianness.Local, Endianness.Big);
+        actual = EndianToolkit.Convert(actual, Endianness.Local, Endianness.Big);
         output.WriteLine("expected: " + expected);
         output.WriteLine("actual: " + actual);
         Assert.Equal(expected, actual);
