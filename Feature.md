@@ -26,7 +26,17 @@
     + 源码位置: 自己翻 
     + `ConvertMany<T>(values,from,to)`同上，针对多个元素不会多次评估是否包含`指针(T*,ref)`
     + `ReverseMany<T>`依旧是`Span`和`指针(T*)`
-
++ ### `Pin<T>` ,A `GCHandle` Wrapper
+  + 为NET10以下版本提供一个带Dispose方法的GCHandle
+  + NET10以上请使用标准库[PinnedGCHandle\<T>](https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.pinnedgchandle-1?view=net-10.0)
+    + 行为与NET10的`PinnedGCHandle`有些不一致,`PinnedGCHandle`类型范围更大,它不检查对象是否是`可Pin`的
+    + 我的实现`Pin`作为`GCHandle`的封装,并不能绕过`GCHandle`的API限制
+    + 主要行为: struct Pin<TPinned>/static PinExtension
+    + 命名空间: Iks.BinaryToolkit.UnsafeToolkit.Pin<TPinned>
+    + 源码位置: 自己翻
+  + 用途: 暂时pin住一个对象，用于与非托管代码交互，主要提供语法简洁性、额外的null检查、using自动释放
+> [!CAUTION]  
+> Remember To Dispose It!
 # Thinking
 + ## 还没想好(大声)
 + ### 欢迎贡献
