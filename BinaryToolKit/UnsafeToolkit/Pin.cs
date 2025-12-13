@@ -1,16 +1,19 @@
-﻿
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Iks.BinaryToolKit.Message;
 
 namespace Iks.BinaryToolkit.UnsafeToolkit;
+
 
 
 /// <summary>
 /// Generics Supported and <c>Auto-Release</c> <see cref="GCHandle"/> of <see cref="GCHandleType.Pinned"/>.
 /// </summary>
 /// <param name="objectNeededPinning">An object which you want to pin for sometime</param>
+#if NET10_0_OR_GREATER
+[Obsolete(ObsoleteMessage.Use_PinnedGCHandle_From_Standard,false)]
+#endif
 [DebuggerDisplay("Address = {Address}, Target = {Target}")]
 public struct Pin<TPinned>(TPinned objectNeededPinning) : IDisposable, IEquatable<Pin<TPinned>> where TPinned : class
 {
@@ -88,6 +91,9 @@ public struct Pin<TPinned>(TPinned objectNeededPinning) : IDisposable, IEquatabl
 /// <summary>
 /// Provide <see cref="Pin{TPinned}">Pin</see> extension ,such as PinIt,
 /// </summary>
+#if NET10_0_OR_GREATER
+[Obsolete(ObsoleteMessage.Use_PinnedGCHandle_From_Standard,false)]
+#endif
 public static class PinExtension
 {
     /// <summary />
