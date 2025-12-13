@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Iks.BinaryToolKit.Message;
 
 namespace Iks.BinaryToolkit;
 

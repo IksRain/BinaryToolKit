@@ -1,4 +1,4 @@
-﻿namespace Iks.BinaryToolkit;
+﻿namespace Iks.BinaryToolKit.Message;
 
 internal static class ErrorMessage
 {
