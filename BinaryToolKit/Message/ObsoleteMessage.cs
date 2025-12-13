@@ -1,6 +1,5 @@
 ﻿namespace Iks.BinaryToolKit.Message;
 
-
 internal static class ObsoleteMessage
 {
     public const string Use_PinnedGCHandle_From_Standard =

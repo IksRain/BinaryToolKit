@@ -63,7 +63,7 @@ public static class BinaryStreamToolkit
         }
 
         /// <summary>
-        ///  write an unmanaged type(value) to the stream.
+        ///     write an unmanaged type(value) to the stream.
         /// </summary>
         /// <typeparam name="T">target type</typeparam>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -76,9 +76,9 @@ public static class BinaryStreamToolkit
         {
             stream.Write(new ReadOnlySpan<byte>(&value, sizeof(T)));
         }
-        
+
         /// <summary>
-        /// write an unmanaged type(value) to the stream.
+        ///     write an unmanaged type(value) to the stream.
         /// </summary>
         /// <typeparam name="T">target type</typeparam>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -107,7 +107,7 @@ public static class BinaryStreamToolkit
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe void ReadManyAs<T>(Span<T> targetSpan) where T : unmanaged
         {
-            fixed(T* ptrT = &MemoryMarshal.GetReference(targetSpan))
+            fixed (T* ptrT = &MemoryMarshal.GetReference(targetSpan))
             {
                 ReadManyAs(stream, ptrT, targetSpan.Length);
             }
@@ -155,9 +155,9 @@ public static class BinaryStreamToolkit
         /// <param name="values">target position</param>
         public unsafe void WriteManyFrom<T>(ReadOnlySpan<T> values) where T : unmanaged
         {
-            fixed(T* ptrT = &MemoryMarshal.GetReference(values))
+            fixed (T* ptrT = &MemoryMarshal.GetReference(values))
             {
-                WriteManyFrom(stream,ptrT, values.Length);
+                WriteManyFrom(stream, ptrT, values.Length);
             }
         }
 

@@ -7,6 +7,24 @@ namespace BinaryKit_Test;
 
 public class StreamExTest(ITestOutputHelper output)
 {
+    #region WriteFrom Tests
+
+    [Fact]
+    public unsafe void Write()
+    {
+        UnionStruct expected = new();
+        UnionStruct value = default;
+        using var stream = new MemoryStream();
+        stream.WriteFrom(expected);
+        stream.Position = 0;
+        stream.GetBuffer().AsSpan(0, sizeof(UnionStruct)).CopyTo(new Span<byte>(&expected, sizeof(UnionStruct)));
+        output.WriteLine("left: " + expected);
+        output.WriteLine("right: " + value);
+        Assert.Equal(expected, value);
+    }
+
+    #endregion
+
     #region ReadAs Tests
 
     [Fact]
@@ -65,29 +83,12 @@ public class StreamExTest(ITestOutputHelper output)
 
     #endregion
 
-    #region WriteFrom Tests
-
-    [Fact]
-    public unsafe void Write()
-    {
-        UnionStruct expected = new();
-        UnionStruct value = default;
-        using var stream = new MemoryStream();
-        stream.WriteFrom(expected);
-        stream.Position = 0;
-        stream.GetBuffer().AsSpan(0, sizeof(UnionStruct)).CopyTo(new Span<byte>(&expected, sizeof(UnionStruct)));
-        output.WriteLine("left: " + expected);
-        output.WriteLine("right: " + value);
-        Assert.Equal(expected, value);
-    }
-    #endregion
-
     #region Multiple-Test
 
     [Fact]
     public unsafe void MultipleRead()
     {
-        byte[] ints = [10,20,30,40];
+        byte[] ints = [10, 20, 30, 40];
         Span<int> span = stackalloc int[1];
         var ptr = (int*)Unsafe.AsPointer(ref MemoryMarshal.GetReference(ints));
         var expected = *ptr;
@@ -99,17 +100,16 @@ public class StreamExTest(ITestOutputHelper output)
         stream.ReadManyAs(span2);
         if (span2[0] != *(short*)ptr) Assert.Fail();
         if (span2[1] != ((short*)ptr)[1]) Assert.Fail();
-    } 
-    
+    }
+
     [Fact]
     public void MultipleWrite()
     {
-        byte[] ints = [10,20,30,40];
+        byte[] ints = [10, 20, 30, 40];
         using var stream = new MemoryStream();
         stream.WriteManyFrom(ints);
-        if (stream.GetBuffer() is not [10,20,30,40,..]) Assert.Fail();
-    } 
-    
+        if (stream.GetBuffer() is not [10, 20, 30, 40, ..]) Assert.Fail();
+    }
 
     #endregion
 }

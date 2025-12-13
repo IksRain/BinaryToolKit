@@ -1,11 +1,8 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using Iks.BinaryToolkit.UnsafeToolkit;
-using Xunit.Abstractions;
+﻿using Iks.BinaryToolkit.UnsafeToolkit;
 
 namespace BinaryKit_Test.UnsafeToolkit;
 
-public class PinTest(ITestOutputHelper output)
+public class PinTest
 {
     // pin must be not null
     [Fact]
@@ -18,13 +15,14 @@ public class PinTest(ITestOutputHelper output)
             using var pin = str.AsPinned();
         }
         // throws is right,null cannot be pinned
-        catch (Exception e)
+        catch
         {
             return;
         }
+
         Assert.Fail();
     }
-    
+
     [Fact]
     public void NotUseAfterRelease()
     {
@@ -35,12 +33,14 @@ public class PinTest(ITestOutputHelper output)
         {
             var pinTarget = pin.Target;
         }
-        catch 
+        catch
         {
             return;
         }
+
         Assert.Fail();
     }
+
     [Fact]
     public void NotMultipleRelease()
     {
@@ -51,13 +51,14 @@ public class PinTest(ITestOutputHelper output)
         {
             pin.Dispose();
         }
-        catch 
+        catch
         {
             return;
         }
+
         Assert.Fail();
     }
-    
+
     [Fact]
     public void CopyRelease()
     {
@@ -65,6 +66,4 @@ public class PinTest(ITestOutputHelper output)
         var pin_new = pin_old;
         pin_new.Dispose();
     }
-
-    
 }

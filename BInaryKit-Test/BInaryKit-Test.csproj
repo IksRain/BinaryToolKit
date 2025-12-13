@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BinaryToolKit\BinaryToolKit.csproj" />
+        <ProjectReference Include="..\BinaryToolKit\BinaryToolKit.csproj"/>
     </ItemGroup>
 
 </Project>
