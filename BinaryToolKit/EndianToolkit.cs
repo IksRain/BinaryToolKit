@@ -187,9 +187,12 @@ public enum Endianness
 /// Extension of <see cref="Endianness"/>,provide <c>Local</c>
 public static class EndiannessExtension
 {
-    private static readonly Endianness LocalEndianness =
+    /// <summary>
+    /// Same as <see cref="EndiannessExtension.extension(Endianness).Local">Local</see>,Just to support C# 13 and less
+    /// </summary>
+    public static readonly Endianness LocalEndianness =
         BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
-
+    /// <summary/>
     extension(Endianness obj)
     {
         /// <summary>
