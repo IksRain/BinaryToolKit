@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Iks.BinaryToolkit;
 
 /// <summary>
-/// provides methods to process endianness of unmanaged types,including int,float.
+///     provides methods to process endianness of unmanaged types,including int,float.
 /// </summary>
 public static class EndianToolkit
 {
@@ -43,7 +43,7 @@ public static class EndianToolkit
     #region Single
 
     /// <summary>
-    /// reverses the endianness of an unmanaged type(value).
+    ///     reverses the endianness of an unmanaged type(value).
     /// </summary>
     /// <param name="value">value wait to reverse</param>
     /// <typeparam name="T">type you want to reverse</typeparam>
@@ -60,7 +60,7 @@ public static class EndianToolkit
     }
 
     /// <summary>
-    /// reverses the endianness of an unmanaged type(value).
+    ///     reverses the endianness of an unmanaged type(value).
     /// </summary>
     /// <param name="value">target position you want to reverse</param>
     /// <param name="length">The size of the element that this pointer points to</param>
@@ -72,8 +72,9 @@ public static class EndianToolkit
 
 
     /// <summary>
-    /// converts the endianness of an unmanaged type(value) from one to another.
-    /// it cannot to make sure struct members are all in the same endian.it just reverses byte-endianness of the whole struct.
+    ///     converts the endianness of an unmanaged type(value) from one to another.
+    ///     it cannot to make sure struct members are all in the same endian.it just reverses byte-endianness of the whole
+    ///     struct.
     /// </summary>
     /// <param name="value">target value</param>
     /// <param name="from">source endian,can use local</param>
@@ -87,10 +88,7 @@ public static class EndianToolkit
 #endif
     {
         // differ, reverse
-        if (from != to)
-        {
-            ReverseNoCheck(&value, sizeof(T));
-        }
+        if (from != to) ReverseNoCheck(&value, sizeof(T));
 
         return value;
     }
@@ -101,7 +99,7 @@ public static class EndianToolkit
     #region Multiple
 
     /// <summary>
-    /// reverses the endianness of multiple unmanaged type(values).
+    ///     reverses the endianness of multiple unmanaged type(values).
     /// </summary>
     /// <param name="values">target enumerable wait to reverse</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -114,7 +112,7 @@ public static class EndianToolkit
     }
 
     /// <summary>
-    /// reverses the endianness of multiple unmanaged type(values).
+    ///     reverses the endianness of multiple unmanaged type(values).
     /// </summary>
     /// <param name="target">target position to reverse endianness</param>
     /// <param name="elementSize">The size of the element that this pointer points to</param>
@@ -133,7 +131,7 @@ public static class EndianToolkit
     }
 
     /// <summary>
-    /// converts the endianness of multiple unmanaged type(value) from one to another.
+    ///     converts the endianness of multiple unmanaged type(value) from one to another.
     /// </summary>
     /// <param name="target">target position to reverse endianness</param>
     /// <param name="from">source endian</param>
@@ -148,7 +146,7 @@ public static class EndianToolkit
     }
 
     /// <summary>
-    /// converts the endianness of multiple unmanaged type(value) from one to another.
+    ///     converts the endianness of multiple unmanaged type(value) from one to another.
     /// </summary>
     /// <param name="target">target position to reverse endianness</param>
     /// <param name="elementSize">The size of the element that this pointer points to</param>
@@ -169,32 +167,39 @@ public static class EndianToolkit
 }
 
 /// <summary>
-/// endianness type definition
+///     endianness type definition
 /// </summary>
 public enum Endianness
 {
     /// <summary>
-    /// little-endian byte order
+    ///     little-endian byte order
     /// </summary>
     Little,
 
     /// <summary>
-    /// big-endian byte order
+    ///     big-endian byte order
     /// </summary>
     Big
 }
 
-/// Extension of <see cref="Endianness"/>,provide <c>Local</c>
+/// Extension of
+/// <see cref="Endianness" />
+/// ,provide
+/// <c>Local</c>
 public static class EndiannessExtension
 {
-    private static readonly Endianness LocalEndianness =
+    /// <summary>
+    ///     Same as <see cref="EndiannessExtension.extension(Endianness).Local">Local</see>,Just to support C# 13 and less
+    /// </summary>
+    public static readonly Endianness LocalEndianness =
         BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
 
+    /// <summary />
     extension(Endianness obj)
     {
         /// <summary>
-        /// local machine byte order
-        /// same as BitConverter.IsLittleEndian
+        ///     local machine byte order
+        ///     same as BitConverter.IsLittleEndian
         /// </summary>
         public static Endianness Local => LocalEndianness;
     }

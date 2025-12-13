@@ -27,7 +27,7 @@
         <DefineConstants>TRACE RELEASE</DefineConstants>
         <Optimize>true</Optimize>
         <DebugSymbols>true</DebugSymbols>
-        <DocumentationFile>bin\PackNuget\BinaryToolKit.xml</DocumentationFile>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <DebugType>portable</DebugType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>

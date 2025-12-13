@@ -10,14 +10,14 @@ public class EndianTest(ITestOutputHelper output)
     public void Read_int()
     {
         const int value = 1000;
-        var expected = BitConverter.IsLittleEndian ? value : System.Buffers.Binary.BinaryPrimitives.ReverseEndianness(value);
+        var expected = BitConverter.IsLittleEndian ? value : BinaryPrimitives.ReverseEndianness(value);
         var actual = value;
         actual = EndianToolkit.Convert(actual, Endianness.Local, Endianness.Little);
         output.WriteLine("expected: " + expected);
         output.WriteLine("actual: " + actual);
         Assert.Equal(expected, actual);
     }
-    
+
     [Fact]
     public unsafe void Read_Struct()
     {
@@ -25,10 +25,7 @@ public class EndianTest(ITestOutputHelper output)
         var expected = value;
         var actual = value;
         // to big endian
-        if (BitConverter.IsLittleEndian)
-        {
-            new Span<byte>(&expected, sizeof(UnionStruct)).Reverse();
-        }
+        if (BitConverter.IsLittleEndian) new Span<byte>(&expected, sizeof(UnionStruct)).Reverse();
         // to big endian
         actual = EndianToolkit.Convert(actual, Endianness.Local, Endianness.Big);
         output.WriteLine("expected: " + expected);
@@ -41,7 +38,7 @@ public class EndianTest(ITestOutputHelper output)
     [Fact]
     public void ReverseManyTest()
     {
-        Span<int> old = [10,20,30,40,50,60,70,80];
+        Span<int> old = [10, 20, 30, 40, 50, 60, 70, 80];
         Span<int> expected = stackalloc int[old.Length];
         for (var index = 0; index < old.Length; index++)
         {
@@ -50,15 +47,10 @@ public class EndianTest(ITestOutputHelper output)
         }
 
         EndianToolkit.ReverseMany(old);
-        for (int i = 0; i < old.Length; i++)
-        {
+        for (var i = 0; i < old.Length; i++)
             if (old[i] != expected[i])
-            {
                 Assert.Fail();
-            }
-        }
     }
-    
 
     #endregion
 }
