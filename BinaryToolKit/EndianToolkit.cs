@@ -105,9 +105,30 @@ public static class EndianToolkit
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static unsafe void ReverseMany<T>(Span<T> values) where T : unmanaged
     {
-        fixed (T* ptr = &MemoryMarshal.GetReference(values))
+        switch (sizeof(T))
         {
-            ReverseMany(ptr, sizeof(T), values.Length);
+            case 1:
+                return;
+            case 2:
+                var case2 = MemoryMarshal.Cast<T, short>(values);
+                BinaryPrimitives.ReverseEndianness(case2, case2);
+                return;
+            case 4:
+                var case4 = MemoryMarshal.Cast<T, int>(values);
+                BinaryPrimitives.ReverseEndianness(case4, case4);
+                return;
+            case 8:
+                var case8 = MemoryMarshal.Cast<T, long>(values);
+                BinaryPrimitives.ReverseEndianness(case8, case8);
+                return;
+            case 16:
+                var case16 = MemoryMarshal.Cast<T, Int128>(values);
+                BinaryPrimitives.ReverseEndianness(case16, case16);
+                return;
+            default:
+                MemoryMarshal.Cast<T, byte>(values).Reverse();
+                values.Reverse();
+                return;
         }
     }
 
@@ -119,14 +140,43 @@ public static class EndianToolkit
     /// <param name="elementCount">The number of elements pointed to by this pointer</param>
     public static unsafe void ReverseMany(void* target, int elementSize, int elementCount)
     {
-        // do not reverse
-        if (elementSize == 1) return;
-        var targetPtr = (byte*)target;
-        // do reverse
-        while (elementCount-- > 0)
+       
+        switch (elementSize)
         {
-            ReverseNoCheck(targetPtr, elementSize);
-            targetPtr += elementSize;
+            case 1:
+                return;
+            case sizeof(short):
+                ReverseMany(new Span<short>(target, elementCount));
+                return;
+            case sizeof(int):
+                ReverseMany(new Span<int>(target, elementCount));
+                return;
+            case sizeof(long):
+                ReverseMany(new Span<long>(target, elementCount));
+                return;
+            case sizeof(long) * 2:
+                ReverseMany(new Span<Int128>(target, elementCount));
+                return;
+            // How can I get standard library-level performance,HOW!
+            default:
+                var byteLenght = elementCount * elementSize;
+                var data = new Span<byte>(target, byteLenght);
+                // reverse bytes
+                data.Reverse();
+                // reverse index
+                Span<byte> tempBuffer = stackalloc byte[elementSize];
+                var (leftPos, rightPos) = (0, elementCount - 1);
+                while (leftPos < rightPos)
+                {
+                    var left = data.Slice(leftPos * elementSize, elementSize);
+                    var right = data.Slice(rightPos*elementSize,elementSize);
+                    left.CopyTo(tempBuffer);
+                    right.CopyTo(left);
+                    tempBuffer.CopyTo(right);
+                    leftPos++;
+                    rightPos--;
+                }
+                return;
         }
     }
 
@@ -139,10 +189,10 @@ public static class EndianToolkit
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static unsafe void ConvertMany<T>(Span<T> target, Endianness from, Endianness to) where T : unmanaged
     {
-        fixed (T* ptr = &MemoryMarshal.GetReference(target))
-        {
-            ConvertMany(ptr, sizeof(T), target.Length, from, to);
-        }
+        // same,do nothing
+        if (from == to) return;
+        // differ, reverse
+        ReverseMany(target);
     }
 
     /// <summary>
